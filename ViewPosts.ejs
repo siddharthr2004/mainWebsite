@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Posts in <%= subName %></title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            color: red;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .post-box {
+            width: 50%;
+            margin: 20px auto;  /* margin will automatically stack posts one after another */
+            padding: 20px;
+            border: 1px solid black;
+            border-radius: 10px;
+            background-color: #ffffff;
+            text-align: center;
+            position: relative;  /* Ensure relative positioning so elements stack */
+        }
+
+        .post-box h2 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        .go-button {
+            background-color: black;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .go-button:hover {
+            background-color: darkgray;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Welcome to <%= subName %></h1>
+
+<% if (posts.length > 0) { %>
+    <!-- Reverse the posts array to display the newest posts first -->
+    <% posts.reverse().forEach((post) => { %>
+        <!-- Create a post box for each post, showing the post title -->
+        <div class="post-box">
+            <h2><%= post.title %></h2>
+            <!-- Button to go to the specific post using postId -->
+            <form action="/<%= subName %>/viewPost/<%= post.id %>" method="GET">
+                <button type="submit" class="go-button">Go</button>
+            </form>
+        </div>
+    <% }) %>
+    <!-- If there are no posts, display a message -->
+<% } else { %>
+    <p>No posts found in this subreddit.</p>
+<% } %>
+
+</body>
+</html>

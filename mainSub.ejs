@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to <%= subName %></title>
+    <style>
+        h1 {
+            color: red;
+            font-size: 30px;
+        }
+        .button {
+            font-size: 20px;
+            color: white;
+            background-color: black;
+            padding: 10px 20px;
+            margin: 10px;
+            text-align: center;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to <%= subName %>!</h1>
+    
+    <div>
+        <a href="/<%= subName %>/view-posts" class="button">View Sub Posts</a>
+        <a href="/<%= subName %>/create-post" class="button">Create a Post</a>
+    </div>
+</body>
+</html>

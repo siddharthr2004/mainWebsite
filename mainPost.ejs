@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post Options</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            width: 50%;
+        }
+        button {
+            padding: 20px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        button.view-comments {
+            background-color: lightblue;
+        }
+        button.create-comment {
+            background-color: lightgreen;
+        }
+    </style>
+</head>
+<body>
+    <!-- Use the postTitle dynamically from the database -->
+    <h1>Options for Post: <%= postTitle %> in r/<%= subName %></h1>
+    <div class="button-container">
+        <!-- Button to view comments on the post -->
+        <form action="/<%= subName %>/viewPost/<%= postId %>/view-comments" method="GET">
+            <button type="submit" class="view-comments">View Comments</button>
+        </form>
+        <!-- Button to create a new comment on the post -->
+        <form action="/<%= subName %>/viewPost/<%= postId %>/create-comment" method="GET">
+            <button type="submit" class="create-comment">Create Comment</button>
+        </form>
+    </div>
+</body>
+</html>

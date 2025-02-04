@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create a New Subreddit</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            background: #f7f7f7;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        label {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        button {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <form action="/make_sub" method="POST">
+        <label for="subName">Please enter a Subreddit Name:</label>
+        <input type="text" id="subName" name="subName" required>
+        <button type="submit">Create Subreddit</button>
+    </form>
+</body>
+</html>
