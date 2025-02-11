@@ -1,7 +1,7 @@
 #  Chatsite Application
 
 A discussion forum where users can create **forums, posts, and comments!**  
-Built with **Node.js, Express, and SQLite** 🚀  
+Built with **Node.js, Express, and SQLite**  
 
 ---
 
