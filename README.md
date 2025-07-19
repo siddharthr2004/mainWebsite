@@ -1,11 +1,11 @@
-#  Chatsite Application
+# Chatsite Application
 
 A discussion forum where users can create **forums, posts, and comments!**  
 Built with **Node.js, Express, and SQLite**  
 
 ---
 
-## 🎯 Features  
+## Features  
 -  **User signup & login**  
 -  **Create and browse subreddits**  
 -  **Post creation with comments**   
@@ -15,21 +15,12 @@ Built with **Node.js, Express, and SQLite**
 ---
 
 ## Website link:  
-🔹 **Try it here:** (https://chatsite.siddharth-rajan.dev/)  
-
----
-
-
-##  Tech Stack  
-- **Frontend:** HTML, CSS, EJS  
-- **Backend:** Node.js, Express, bcrypt  
-- **Database:** SQLite3  
-- **Hosting:** Cpanel 
+**Try it here:** (https://chatsite.siddharth-rajan.dev/)  
 
 ---
 
 ##  How to Run Locally
-If you want to test it locally, follow these steps:
+Follow these steps:
 
 ```bash
 # Clone the repository
