@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Comments</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+
+        h1 {
+            color: black;
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .post-content {
+            width: 66%;
+            padding: 15px;
+            font-size: 18px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            margin-bottom: 30px;
+            min-height: 100px; /* For posts with smaller content */
+        }
+
+        .comment-box {
+            width: 60%;
+            margin: 10px auto;  /* margin will automatically stack comments */
+            padding: 15px;
+            border: 1px solid black;
+            border-radius: 10px;
+            background-color: #ffffff;
+            font-size: 14px;
+            position: relative;  /* Ensure relative positioning so elements stack */
+        }
+
+        .comment-box .user-id {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .comment-box .comment-content {
+            padding-left: 10px;
+        }
+
+        .comments-section {
+            margin-top: 40px;
+        }
+
+        .comments-section h2 {
+            font-size: 24px;
+            color: black;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<h1><%= postTitle %></h1>
+
+<div class="post-content">
+    <p><%= postContent %></p>
+</div>
+
+<div class="comments-section">
+    <h2>Comments:</h2>
+
+    <% if (comments.length > 0) { %>
+        <% comments.forEach(comment => { %>
+            <div class="comment-box">
+                <div class="user-id">User ID: <%= comment.user_id %></div>
+                <div class="comment-content"><%= comment.content %></div>
+            </div>
+        <% }) %>
+    <% } else { %>
+        <p>No comments yet.</p>
+    <% } %>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Comment</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            font-size: 24px;
+            width: 33%;
+            color: black;
+        }
+        textarea {
+            width: 66%;
+            height: 50%;
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Comment:</h1>
+    
+    <!-- Form for submitting a comment -->
+    <form action="/<%= subName %>/viewPost/<%= postId %>/commentCreated" method="POST">
+        <textarea name="commentContent" required></textarea>
+        <button type="submit">Comment Now!</button>
+    </form>
+</body>
+</html>
