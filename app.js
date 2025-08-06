@@ -1,153 +1,142 @@
-//THIS WILL BE FOR THE COMMONJS RENDERING
-
-const express = require('express'); // CommonJS import for Express
-const fs = require('fs'); // File system module
-const path = require('path'); // Path module
-const bodyParser = require('body-parser'); // Middleware for parsing request bodies
-const ejs = require('ejs'); // Template engine
-
-
-
-//ES RENDERING ONLY
-/*
-import express from 'express';
-import fs from 'fs';
-import path from 'path';
-import bodyParser from 'body-parser';
-import ejs from 'ejs';
-*/
-
-//import PastWeather from './pastWeather.js';
-
-//THIS IS FOR TESTING ONLY
-try {
-    const Greeting = require('./Greeting.js');
-} catch (error) {
-    console.log(error);
-}
-
-//THIS IS MOSTLY FOR TESTING PURPOSES THOUGH THE FIRST PART IS STILL IMPORTANT HERE
-try {
-    // COMMONJS IMPORT
-    const PastWeather = require('./pastWeather.js');
-    const testInstance = new PastWeather('GHCND:USC00051547');
-    console.log("Test instance created successfully:", testInstance);
-    
-    try {
-        // Instantiate the class
-        const px = new PastWeather('GHCND:USC00051547'); // Pass a valid parameter
-        console.log("PastWeather instance created successfully.");
-
-        // Assuming the class has a method like `parseData`, you would call it here:
-        px.parseData()
-            .then((reply) => {
-                console.log("Parse Data executed successfully:", reply);
-            })
-            .catch((error) => {
-                console.error("Error during parseData execution:", error);
-            });
-
-    } catch (innerError) {
-        console.error("Error initializing PastWeather instance or calling its methods:", innerError);
-    }
-    
-
-} catch (error) {
-    console.error('Error importing PastWeather class:', error);
-}
-    
-  
-  
-
-//This takes the path dirname (since ES doesn't do dirnames) and instead we get the meta url
-//which is our main file path, and then we get the pathname to our current app.js file here 
-
-
+const express = require('express');
+const path = require('path');
+const bodyParser = require('body-parser');
+const sqlite3 = require('sqlite3').verbose();
+const bcrypt = require('bcrypt');
 const app = express();
 
+// Serve static files from the 'public_html' directory
+app.use(express.static(path.join(__dirname, '../public_html')));
 
-//CommonJS RENDERING
-app.use(express.static(path.join(__dirname, 'public_html')));
-
-//ES RENDERING:
-//const __dirname = path.dirname(new URL(import.meta.url).pathname);
-
-
-// Serve static files in "public_html" folder
-app.use(express.static(path.join(__dirname, 'public_html')));
-
-
-// Set up EJS as the view engine
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
-
-// Middleware
+//used too parse a POST request in HTML file into data which can be stored in db
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
 
-// Define route to serve the main page
+//this will instantiate a database sql object. This will also create a database file
+//within your myApp folder on cPanel called 'users.db'
+let db = new sqlite3.Database('users.db', (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log('Connected to the SQLite database.');
+  });
+
+  //this creates the actual db. Serialize is automatic method to sequentialize ordering of 
+  //steps too create db. Run method runs the database, with table created if not exists.
+  //three different variables, id, user, passwd are created, with id being autoincremented
+  //(the values inside quotes are commands for db)
+  db.serialize(() => {
+    db.run("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT)");
+  });
+
+// Default route to serve signIn.html when the root URL is accessed
 app.get('/', (req, res) => {
-   //ONLY FOR TESTING PURPOSES
-    //res.send("ES TEST!");
-    //REAL CODE HERE
-    
-    try {
-        // Read locations data from locations.txt
-        const locationsPath = path.join(__dirname, 'filteredLocations.txt');
-        const locationsData = fs.readFileSync(locationsPath, 'utf-8');
-        const locations = JSON.parse(locationsData); // Parse JSON data
-
-        // Render the EJS template with the locations
-        res.render('mainPage', { locations });
-    } catch (error) {
-        console.error("Error reading locations.txt:", error.message);
-        res.status(500).send("Error loading location data.");
-    }
-    
-
+  res.sendFile(path.join(__dirname, '../public_html', 'signIn.html'));
 });
 
-// Define route for form submission (if needed)
-app.post('/getLatandLang', async (req, res) => {
+//is a post signal is sent (by clicking 'register'), then user will be guided too /register
+//httep request. At this point, we extract user,passwd from req.body which through bodyparser
+//was parsed into user friendly format earlier. We then run and insert the user and the 
+//password into our database
+app.post('/register', (req, res) => {
+    const { username, password } = req.body;
+    db.run(`INSERT INTO users (username, password) VALUES (?, ?)`, [username, password], function (err) {
+      if (err) {
+        return console.error(err.message);
+      }
+      res.send('User registered successfully');
+    });
+  });
 
-    //THIS IS ONLY FOR TESTING IF CLASSES CAN EVEN BE INSTANTIATED WITHIN POST CALLS
-    try{
-        const gr = new Greeting("Siddharth");
-        res.send(gr.sayHello());
-    } catch(error) {
-        console.log(error);
-    }
 
-    /*
-    try {
-        // Initialize the PastWeather instance
-        const testInstance = new PastWeather('GHCND:USC00261327');
-
-        // Check if the instance is properly created
-        if (testInstance) {
-            res.json({
-                message: "Test instance sent successfully",
-                testInstance: testInstance.locationID, // Return relevant data
-            });
+  // From the login option. user and paswd are taken from req body. The * option in db.get
+  //selects all columns where username and password = ?, which is how the username and password
+  //are extracted from the req.body and placed into sql too search in it's file. 
+  //side note: app.post() has two value sin its interface: req,res; and with these we can do
+  //a combination of different things by extracting from the html "post"
+  app.post('/login', (req, res) => {
+    const { username, password } = req.body;
+    db.get(`SELECT * FROM users WHERE username = ?`, [username], (err, row) => {
+      if (err) {
+        return console.error(err.message);
+      }
+      if (row) {
+        // Directly compare the plain text password
+        if (password === row.password) {
+          res.sendFile(path.join(__dirname, '../public_html', 'mainPage.html'));
         } else {
-            throw new Error("Failed to initialize PastWeather instance.");
+          res.send('Invalid credentials');
         }
-    } catch (error) {
-        console.error("Error in /getLatandLang route:", error);
-        res.status(500).json({
-            message: "An error occurred while processing the request.",
-            error: error.message,
-        });
-    }
-    */
+      } else {
+        res.send('Invalid credentials');
+      }
+    });
+  });
 
-        
+  app.post('/create-subreddit', (req, res) => {
+    // Redirect the user to the /createSub route
+    res.redirect('/createSub');
 });
 
+app.get('/createSub', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public_html', 'createSub.html'));
+});
+
+//Here we will be intializing a database which will store all of the subreddits which exist
+let subredditsDb = new sqlite3.Database('subreddits.db', (err) => {
+  if (err) {
+    return console.error('Error connecting to subreddits.db:', err.message);
+  }
+  console.log('Connected to the subreddits.db');
+});
+
+//we will then mark down how we want to organize this sqlite database here
+subredditsDb.serialize(() => {
+  subredditsDb.run(`
+    CREATE TABLE IF NOT EXISTS subreddits (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT UNIQUE
+    )
+  `);
+});
+
+//this has it such that each time the /login page is accessed, the particular file will be sent
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public_html', 'mainPage.html'));
+});
+
+//POST from the /make_sub so take in the /make_sub url and both store the recently added
+//subreddit value into the newly created db 
+app.post('/make_sub', (req, res) => {
+  const subname = req.body.subname;  // assuming 'subname' is the field in the form
+
+  subredditsDb.run(`INSERT INTO subreddits (name) VALUES (?)`, [subname], function (err) {
+    if (err) {
+      return res.send('Error: Subreddit name already exists or an error occurred.');
+    }
+    res.redirect('/login');
+  });
+});
+
+// Catch all dynamic subreddit routes, if the / value after is not caught from the before pats, it 
+//will be caught here
+app.get('/:subName', (req, res) => {
+  const subName = req.params.subName;
+  subredditsDb.get(`SELECT * FROM subreddits WHERE name = ?`, [subName], (err, row) => {
+    if (err) {
+      return res.send('Error querying the database.');
+    }
+    
+    if (row) {
+      res.send(`Welcome to r/${subName}!`);
+    } else {
+      res.send(`Subreddit r/${subName} not found!`);
+    }
+  });
+});
 
 
 // Start the server
-const port = process.env.PORT || 3008;
+const port = process.env.PORT || 3000;
 app.listen(port, () => {
-    console.log(`Node.js app listening on port ${port}`);
+  console.log(`Node.js app listening on port ${port}`);
 });

@@ -3,35 +3,69 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Welcome to my Website</title>
+  <title>Scroll Project Example</title>
   <style>
     body {
       background-color: black;
       color: white;
-      font-family: 'Courier Sans', monospace;
+      font-family: Arial, sans-serif;
       text-align: center;
       margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      height: 100vh;
+      padding: 20px;
+      min-height: 200vh; /* Enough space to scroll */
+      transition: background-color 0.5s ease, color 0.5s ease;
     }
     h1 {
-      font-size: 3em;
-      font-weight: bold;
+      font-size: 2.5em;
     }
     p {
-      font-size: 1.5em;
-    }
-    .signature {
       font-size: 1.2em;
+    }
+    #projects {
+      display: none; /* Initially hidden */
+      background-color: white;
+      color: black;
+      padding: 20px;
+      margin-top: 50px;
+      border: 1px solid #ccc;
+    }
+    a {
+      color: blue;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
   <h1>Welcome to my website!</h1>
-  <p>Below you will be able to access links, projects, resumes and much more!</p>
-  <p class="signature">This webpage is by Siddharth Rajan</p>
+  <p>Scroll down to see more projects</p>
+
+  <!-- Projects section -->
+  <div id="projects">
+    <h2>My Projects</h2>
+    <ul>
+      <li><a href="https://example.com" target="_blank">Example Project</a></li>
+    </ul>
+  </div>
+
+  <script>
+    window.addEventListener('scroll', () => {
+      const scrollPos = window.scrollY;
+      const windowHeight = window.innerHeight;
+
+      // Change background and text color when scrolling down
+      if (scrollPos > windowHeight) {
+        document.body.style.backgroundColor = 'white';
+        document.body.style.color = 'black';
+        document.getElementById('projects').style.display = 'block'; // Show the projects section
+      } else {
+        document.body.style.backgroundColor = 'black';
+        document.body.style.color = 'white';
+        document.getElementById('projects').style.display = 'none'; // Hide the projects section
+      }
+    });
+  </script>
 </body>
 </html>
