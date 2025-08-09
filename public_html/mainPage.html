@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reddit Clone - Main Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #ff4500;
+            margin-bottom: 30px;
+        }
+        .section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+        }
+        .section h2 {
+            color: #333;
+            margin-top: 0;
+        }
+        .form-group {
+            margin: 15px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #ff4500;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #e03e00;
+        }
+        .or-divider {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 18px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to Reddit Clone</h1>
+        
+        <!-- Create New Subreddit Section -->
+        <div class="section">
+            <h2>Create a New Subreddit</h2>
+            <form action="/make_sub" method="POST">
+                <div class="form-group">
+                    <label for="subname">Subreddit Name:</label>
+                    <input type="text" id="subname" name="subname" placeholder="Enter subreddit name (e.g., funny, gaming)" required>
+                </div>
+                <button type="submit">Create Subreddit</button>
+            </form>
+        </div>
+
+        <div class="or-divider">— OR —</div>
+
+        <!-- Visit Existing Subreddit Section -->
+        <div class="section">
+            <h2>Visit a Subreddit</h2>
+            <form onsubmit="visitSubreddit(event)">
+                <div class="form-group">
+                    <label for="visit-subname">Subreddit Name:</label>
+                    <input type="text" id="visit-subname" name="visit-subname" placeholder="Enter subreddit name to visit" required>
+                </div>
+                <button type="submit">Visit Subreddit</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function visitSubreddit(event) {
+            event.preventDefault(); // Prevent default form submission
+            
+            const subname = document.getElementById('visit-subname').value.trim();
+            
+            if (subname) {
+                // Redirect to the subreddit page using GET request
+                window.location.href = '/' + subname;
+            } else {
+                alert('Please enter a subreddit name');
+            }
+        }
+    </script>
+</body>
+</html>
