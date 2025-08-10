@@ -12,7 +12,13 @@ const Post = require('./Post');
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, '../public_html')));
-
+//create an exprss session for the user
+const session = require('express-session');
+app.use((session)({
+  secret: 'muh-scret-key-its-over-ust-code-cope',
+  resave: false, 
+  saveUninitialized: false
+}));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 //init databases. First is for users
@@ -47,13 +53,23 @@ subredditsDb.serialize(() => {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       subreddit_id INTEGER,
       title TEXT NOT NULL,
+      username INTEGER,
       content TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (subreddit_id) REFERENCES subreddits (id)
     )
   `);
+    subredditsDb.run(`
+      CREATE TABLE IF NOT EXISTS comments (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        post_id INTEGER,
+        content TEXT NOT NULL,
+        username TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (post_id) REFERENCES posts (id)
+      )
+    `);
 });
-
 // Default route to serve signIn.html when the root URL is accessed
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../public_html', 'signIn.html'));
@@ -81,6 +97,8 @@ app.post('/register', (req, res) => {
       if (row) {
         // Directly compare the plain text password
         if (password === row.password) {
+          req.session.id = row.id;
+          req.session.username = row.username;
           res.sendFile(path.join(__dirname, '../public_html', 'mainPage.html'));
         } else {
           res.send('Invalid credentials');
@@ -153,7 +171,7 @@ app.get('/:subName', (req, res) => {
 
 
 // Start the server
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 app.listen(port, () => {
   console.log(`Node.js app listening on port ${port}`);
 });

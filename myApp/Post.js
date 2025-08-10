@@ -33,7 +33,8 @@ class Post {
     static addComment(req, res) {
         const {subName, postId} = req.params;
         const { commentContent } = req.body;  // Extract comment content from the form submission
-        const userId = req.session.user_id;  // Get the logged-in user's ID from session
+        //req.session.user_id;  // Get the logged-in user's ID from session
+        const username = req.session.username;  // Get the logged-in user's username from session
 
 
         const db = new sqlite3.Database('subreddits.db', (err) => {
@@ -44,10 +45,11 @@ class Post {
 
     // Insert the comment into the comments table
     db.run(
-        'INSERT INTO comments (post_id, user_id, content) VALUES (?, ?, ?)',
-        [postId, userId, commentContent],
+        'INSERT INTO comments (post_id, content, username) VALUES (?, ?, ?)',
+        [postId, commentContent, username],
         function (err) {
             if (err) {
+                console.log("this is the error message for inserting a comment: ", err.message());
                 return res.send('Error inserting comment into database: ' + err.message);
             }
             db.close();
