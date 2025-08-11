@@ -1,12 +1,21 @@
 const sqlite3 = require('sqlite3').verbose();
 
 class Post {
+
+    constructor(subreddit, postNumber) {
+        this.subreddit = subreddit;
+        this.postNumber = postNumber;
+         this.db = new sqlite3.Database('subreddits.db', (err) => {
+            if (err) {
+                console.error('Error connecting to subreddits.db:', err.message);
+            }
+        });
+    }
     
     // This method handles the logic for rendering the main post
      // This method handles the logic for rendering the main post
-     static mainPost(req, res) {
+      mainPost(req, res) {
         const { subName, postId } = req.params; // Extract subName and postId from req.params
-
         // Connect to the database
         const db = new sqlite3.Database('subreddits.db', (err) => {
             if (err) {
@@ -30,20 +39,41 @@ class Post {
         });
     }
 
-    static addComment(req, res) {
+     addComment(req, res) {
         const {subName, postId} = req.params;
         const { commentContent } = req.body;  // Extract comment content from the form submission
         //req.session.user_id;  // Get the logged-in user's ID from session
         const username = req.session.username;  // Get the logged-in user's username from session
 
-
+        //instantiate the db first
         const db = new sqlite3.Database('subreddits.db', (err) => {
             if (err) {
                 return console.error('error with connection' + err.message)
             }
         })
 
-    // Insert the comment into the comments table
+        // Insert the comment into the comments table
+        this.db.get('SELECT * FROM posts WHERE id = ? AND subreddit_id = ?', [postId, subredditId], (err, row) => {
+            //error message
+            if (err) {
+                console.log("this is the error message ", err.message)
+                console.log("this is the error code ", err.code);
+                return res.send('Error fetching subreddit. ' + err.message + " " + err.code);
+            }
+            if (row) {
+                this.db.run('INSERT INTO comments (post_id, content, username) VALUES (?,?,?)', [postId, 
+                    commentContent, username], (err) => {
+                        if (err) {
+                            console.log("Error inserting comment in due to: ", err.message());
+                            return res.send("error inserting message");
+                        }
+                        this.db.close();
+                        res.redirect(`/${subName}/viewPost/${postId}`);
+                    });
+
+            }
+        });
+    /*
     db.run(
         'INSERT INTO comments (post_id, content, username) VALUES (?, ?, ?)',
         [postId, commentContent, username],
@@ -57,10 +87,11 @@ class Post {
             res.redirect(`/${subName}/viewPost/${postId}`);
         }
     );
+    */
 
     }
 
-    static viewComments(req, res) {
+     viewComments(req, res) {
         const {subName, postId} = req.params;
 
         const db = new sqlite3.Database('subreddits.db', (err) => {
@@ -75,7 +106,7 @@ class Post {
             }
 
             if (post) {
-                db.all('SELECT user_id, content FROM comments WHERE post_id = ?', [postId], (err, comments) => {
+                db.all('SELECT username, content FROM comments WHERE post_id = ?', [postId], (err, comments) => {
                     if (err) {
                         return res.send('Error fetching comments')
                     }
@@ -97,18 +128,28 @@ class Post {
     static renderRoutes(app) {
         // Define the route for viewing a specific post
         app.get('/:subName/viewPost/:postId', (req, res) => {
-            Post.mainPost(req, res);  // Call the method to handle rendering
+            const subName = req.params.subName;
+            const postId = req.params.postId;
+            const postInstance = new Post(subName, postId);
+            postInstance.mainPost(req, res);  // Call the method to handle rendering
         });
         app.get('/:subName/viewPost/:postId/create-comment', (req, res) => {
-            const { subName, postId } = req.params;
-            // Render the form for creating a comment
-            res.render('createComment', { subName, postId });
+            const subName = req.params.subName;
+            const postId = req.params.postId;
+            const postInstance = new Post(subName, postId);
+            postInstance.render('createComment', { subName, postId });
         });
         app.post('/:subName/viewPost/:postId/commentCreated', (req, res) => {
-            Post.addComment(req, res)
+            const subName = req.params.subName;
+            const postId = req.params.postId;
+            const postInstance = new Post(subName, postId);
+            postInstance.addComment(req, res)
         });
         app.get('/:subName/viewPost/:postId/view-comments', (req, res) => {
-            Post.viewComments(req, res);
+            const subName = req.params.subName;
+            const postId = req.params.postId;
+            const postInstance = new Post(subName, postId);
+            postInstance.viewComments(req, res);
         });
     }
 }
